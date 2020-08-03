@@ -1,0 +1,29 @@
+version: "3"
+services:
+  elasticsearch:
+    image: elasticsearch:7.8.1
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      discovery.type: "single-node"
+  
+  kibana:
+    image: kibana:7.8.1
+    ports:
+      - 5601:5601
+
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:7.8.1
+    user: apm-server
+    volumes:
+      - ./apm-server.docker.yml:/usr/share/apm-server/apm-server.yml:ro
+    environment: 
+      output.elasticsearch.hosts: elasticsearch:9200
+
+  civicrm:
+    build: civicrm
+    ports:
+      - 9999:80
+    volumes:
+      - ./civicrm/elastic_apm.ini:/usr/local/etc/php/conf.d/elastic_apm.ini
